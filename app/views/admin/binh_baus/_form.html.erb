@@ -1,0 +1,101 @@
+<script>
+$(function() {
+  $( "#binh_bau_NgayBatDau, #binh_bau_NgayKetThuc" ).datepicker({
+    dateFormat: "yy/mm/dd"
+  });
+  $("#chontieuchi").multiselectcbx({
+    height: 300,
+    header: false,
+    noneSelectedText: "Xin mời chọn tiêu chí",
+    selectedText: "Đã chọn # tiêu chí",
+    click: function(event, ui){
+          var idtieuchi = "#"+ ui.value + "-dstruong";
+          if (ui.checked){
+            $.getJSON('/truongs.json', function(result) {
+                  var items ="";
+                  $.each(result, function(key, val) {
+                    items += ("<option value="+ val.id +">"+ val.TenTruong +"</option>");
+                  });
+            $(idtieuchi).html("<select class='chontruong' multiple='multiple' name='" + ui.value + "-truongs[]'>" + items + "</select>");
+            $("#tieuchi > div").css("display","none");
+            $(idtieuchi).css("display","block");
+            $(idtieuchi + "> .chontruong").multiselect();
+            });
+          }
+          else
+          {
+            $(idtieuchi).css("display","none");
+          }
+    }
+  });
+  $('body').click(function() {
+     if($("#tieuchi > div:hover").length<1){
+      $("#tieuchi > div").css("display","none");
+    }
+  });
+});
+</script>
+
+<%= form_for([:admin, @binh_bau]) do |f| %>
+
+  <div class="field">
+    <label> </label>
+    <% if @binh_bau.errors.any? %>
+      <div id="error_explanation">
+        <h2>Có <%= pluralize(@binh_bau.errors.count, "error") %> lỗi tìm ra khi tạo mới:</h2>
+
+        <ul>
+        <% @binh_bau.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+
+
+  <div class="field">
+    <%= f.label 'Tên bình bầu: ' %>
+    <%= f.text_field :TenBinhBau %>
+  </div>
+  <div class="field">
+    <%= f.label 'Tiêu chí: ' %>
+    <div id="tieuchi">
+        <select id="chontieuchi" multiple="multiple" name="tieuchis[]" style="width:306px">
+          <% TieuChi.all.each do |tc| %>
+            <option value="<%= tc.id %>"><%= tc.TenTieuChi %></option>
+          <%end%>
+        </select>
+          <% TieuChi.all.each do |tc| %>
+              <div id="<%= tc.id %>-dstruong">
+              </div>
+          <%end%>
+    </div>
+  </div>
+  <div class="field">
+    <%= f.label 'Mô tả bình bầu: ' %>
+    <%= f.text_area :MoTaBinhBau %>
+  </div>
+
+  <div class="field">
+    <%= f.label 'Số đánh giá tối đa: ' %>
+    <%= f.select :MaxSao, { "1 Sao" => "1 Sao", "2 Sao" => "2", "3 Sao" => "3", "4 Sao" => "4", "5 Sao" => "5", "6 Sao" => "6", "7 Sao" => "7", "8 Sao" => "8", "9 Sao" => "9", "10 Sao" => "10"}, :prompt => '' %>
+  </div>
+    <div class="field">
+    <%= f.label 'Ngày bắt đầu: ' %>
+    <%= f.text_field :NgayBatDau %>
+  </div>
+  <div class="field">
+    <%= f.label 'Ngày kết thúc: ' %>
+    <%= f.text_field :NgayKetThuc %>
+  </div>
+  <div class="field">
+    <%= f.label 'Trạng thái: ' %>
+    <%= f.check_box :Active, :checked => "checked" %>
+  </div>
+
+  <div class="field" style="margin:30px 0;">
+    <label> </label>
+    <%= f.submit 'Hoàn tất' %>
+  </div>
+<% end %>

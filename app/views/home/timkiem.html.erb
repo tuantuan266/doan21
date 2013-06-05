@@ -1,0 +1,131 @@
+<% @title_page = "Tìm kiếm "+ @key %>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script>
+$(function() {
+	$( "#datef, #datet" ).datepicker({ dateFormat: 'dd-mm-yy' });
+});
+</script>
+
+<div class="row chitiettruong">
+	<%= form_tag("", :method => "post", :id => "TKform") do %>
+	<div class="column" style="padding-left:0;margin-top:3px;">
+		<input type="text" name="key" value="<%= @key %>" onblur="if (this.value == '') {this.value = 'Tìm kiếm chính xác hơn...';}" onfocus="if (this.value == 'Tìm kiếm chính xác hơn...') {this.value = '';}" id="TKkey" maxlength="50" size="37" />
+		<input type="submit" name="TKsubmit" id="TKsubmit" value="Tìm kiếm"/>
+	</div>
+	<div class="column" style="float:right">
+		<h4 class="title0"><b>Ngày tháng</b></h4>
+		<div class="mota-truong">
+			Ngày bắt đầu: <input type="text" name="TKdatef" id="datef" maxlength="10" size="10" value="<%= @datef %>"/>
+			Ngày kết thúc: <input type="text" name="TKdatet" id="datet" maxlength="10" size="10" value="<%= @datet %>"/>
+		</div>
+	</div>
+	<div class="column" >
+		<h4 class="title0"><b>Thể loại</b></h4>
+		<div class="mota-truong">
+			<input type="checkbox" name="TKtruong" <%= if @ctruong then "checked" end %>/> Trường
+			<input type="checkbox" name="TKtieuchi" <%= if @ctchi then "checked" end %>/> Tiêu chí
+			<input type="checkbox" name="TKbinhbau" <%= if @cbinhbau then "checked" end %>/> Bình bầu
+		</div>
+	</div>
+<% end %>
+</div>
+
+<%= @datef %>
+
+<div class="row">
+	<div class="title">Kết quả tìm kiếm</div>
+	<div id="list-binhbau">
+	<% @bb.each do |item| %>
+		<div class="item-binhbau">
+			<h4 class="title0"><span><a href="/binh_baus/<%=item.id%>"><%= highlight item[:TenBinhBau], @wordkeybb,:highlighter => '<span class="hl">\1</span>'  %></a></span> <span style="float:right">(<%= item[:NgayBatDau].strftime("%d/%m/%Y") %> - <%= item[:NgayKetThuc].strftime("%d/%m/%Y") %>)</span></h4>
+			<ul class="danhsach chia2">
+				<% @trg = [] %>
+				<% @s_tc ="" %>
+				<% item.chi_tiet_binh_baus.each do |chitietbb| %>
+					<% chitietbb.chi_tiet_truongs.each do |chitiettrg| %>
+						<% @trg.push chitiettrg.truong %>
+					<% end %>
+					<% @s_tc += "<a href='#'>"+chitietbb.tieu_chi[:TenTieuChi]+"</a>, " %>
+				<% end %>
+				<% @trg.uniq! %>
+				<% @s_trg="" %>
+				<% @trg.each{ |i| @s_trg += "<li>"+i[:TenTruong].to_s+"</li>"} %>
+				<%= highlight @s_trg.html_safe, @wordkeytrg, :highlighter => '<span class="hl">\1</span>' %>
+			</ul>
+			<div class="mota-binhbau">
+				<%= item[:MoTaBinhBau] %>
+			</div>
+			<div class="thongke">
+				<span class="left">
+					<%= highlight @s_tc.html_safe, @wordkeytc, :highlighter => '<span class="hl">\1</span>' %>
+					<a href="#"></a>
+				</span>
+				<span class="right">Lượt view: <%= item[:LuotXem] %> | Lượt bình chọn: <%= item[:LuotBinhBau] %></span>
+			</div>
+		</div>
+	<% end %>
+	<% if @bb.count==0 && @key!="" %>
+		<h4 class="noice-aa">Không tìm thấy bình bầu phù hợp...</h4>
+	<% end %>
+	</div>
+</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu2msimPOhfXuJALCWsB4SBrIobLk9F04&sensor=false"></script>
+    <script>
+		function initialize() {
+
+			var vitri = [
+					  	<% @truongs.each do |truong| %>
+									[new google.maps.LatLng(<%= truong[:ToaDo] %>), '<%= truong_url(truong) %>', '<%= truong[:TenTruong] %>', '<%= truong[:Logo] %>'],
+						<% end %>
+						];
+
+		  	var mapOptions = {
+			    zoom: <%= @map[:zoom] %>,
+			    center: new google.maps.LatLng(<%= @map[:y_p] %>,<%= @map[:x_p] %>),
+			    mapTypeId: google.maps.MapTypeId.ROADMAP,
+			    mapTypeControl: true,
+				    mapTypeControlOptions: {
+				        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+				        position: google.maps.ControlPosition.BOTTOM_LEFT
+				    },
+			    panControl: true,
+				    panControlOptions: {
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+			    zoomControl: true,
+				    zoomControlOptions: {
+				        style: google.maps.ZoomControlStyle.SMALL,
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+		  	}
+
+		  	var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
+
+	  		var pos = 0;
+	  		for (var i = 0; i <= vitri.length - 1; i++) {
+	  			setTimeout(function() {
+		  			marker = new google.maps.Marker({
+					    map:map,
+					    draggable:false,
+					    position: vitri[pos][0],
+    					animation: google.maps.Animation.DROP,
+					    url: vitri[pos][1],
+					    title: vitri[pos][2],
+					    icon: new google.maps.MarkerImage(vitri[pos][3],
+				            new google.maps.Size(50, 50),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Size(50, 50)
+				        )
+				  	});
+				  	google.maps.event.addListener(marker, 'click', function() { window.location.href = this.url; });
+				  	pos +=1;
+			  	}, i *200);
+	  		};
+
+		}
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>

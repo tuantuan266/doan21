@@ -1,0 +1,34 @@
+<h3>Danh sách trường</h3>
+<form action="truongs" method="get" style="float:right">
+  <input type="text" name="search" id="search">
+  <input type="submit" value="Tìm kiếm">
+</form>
+<span class="link_button"><%= link_to 'Thêm trường', new_admin_truong_path %></span>
+<hr/>
+<table cellspacing="0">
+  <tr>
+    <th>Logo</th>
+    <th>Tên trường</th>
+    <th>Liên lạc</th>
+    <th>Tọa độ</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @truongs.each do |truong| %>
+  <tr>
+    <td><%= image_tag truong.Logo, :alt =>"Logo", :width => "100px" %></td>
+    <td width="30%"><%= link_to truong.TenTruong, truong %></td>
+    <td><%= truong.LienLac %></td>
+    <td><%= truong.ToaDo %></td>
+    <td><%= link_to 'Sửa', edit_admin_truong_path(truong) %></td>
+    <td><%= link_to 'Xóa', admin_truong_path(truong), method: :delete, data: { confirm: 'Bạn có chắc muốn xóa?' } %></td>
+  </tr>
+  <tr>
+<% end %>
+</table>
+
+<br>
+
+    <%= will_paginate @truongs %>
+<br />

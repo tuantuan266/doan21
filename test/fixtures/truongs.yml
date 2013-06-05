@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  TenTruong: MyString
+  LienLac: MyString
+  GioiThieu: MyText
+  ToaDo: 
+  Logo: 
+
+two:
+  TenTruong: MyString
+  LienLac: MyString
+  GioiThieu: MyText
+  ToaDo: 
+  Logo: 

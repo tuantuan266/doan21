@@ -1,0 +1,26 @@
+<h3>Danh sách các nhận xét tổng quan</h3>
+<form action="nhan_xet_tqs" method="get" style="float:right">
+  <input type="text" name="search" id="search">
+  <input type="submit" value="Tìm kiếm">
+</form>
+<hr/>
+<table cellspacing="0">
+  <tr>
+    <th>Tên bình bầu</th>
+    <th>User</th>
+    <th>Mội dung</th>
+    <th></th>
+  </tr>
+
+<% @nhan_xet_tqs.each do |nhan_xet_tq| %>
+  <tr>
+    <td><%= link_to nhan_xet_tq.binh_bau.TenBinhBau, nhan_xet_tq.binh_bau %></td>
+    <td><%= nhan_xet_tq.user.HoTen %></td>
+    <td><%= nhan_xet_tq.NoiDung %></td>
+    <td><%= link_to 'Xóa', admin_nhan_xet_tq_path(nhan_xet_tq), method: :delete, data: { confirm: 'Bạn có chắc muốn xóa?' } %></td>
+  </tr>
+<% end %>
+</table>
+<br/>
+    <%= will_paginate @nhan_xet_tqs %>
+<br />

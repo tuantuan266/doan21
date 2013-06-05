@@ -1,0 +1,193 @@
+<% @title_page = @binh_bau.TenBinhBau %>
+<div class="row">
+					<div class="title">
+						<div class="left" style="display:inline-block;">
+							<%= @binh_bau.TenBinhBau %>
+							<span style="color:red">(
+								<% if @binh_bau.Active == false %>Đã hủy
+								<% elsif @binh_bau.NgayKetThuc < DateTime.now %>Đã kết thúc
+								<%else%>
+								<%=@binh_bau.NgayBatDau.strftime("%d/%m/%Y") %> - <%= @binh_bau.NgayKetThuc.strftime("%d/%m/%Y")%>
+								<%end%>)
+							</span><br>
+							<span class="thongke-binhbau" style="color:red">Hiện có <%= @binh_bau.LuotXem %> lượt xem và <%= @binh_bau.LuotBinhBau %> lượt bình bầu</span>
+							<br /><div class="fb-like" data-href="<%= url_for(:only_path=>false) %>" data-send="true" data-width="450" data-show-faces="true" data-font="segoe ui"></div>
+						</div>
+						<a id="xemmota" href="#ctmota"  class="a-button">Xem mô tả</a>
+					</div>
+					<% @binh_bau.chi_tiet_binh_baus.each do |ctbinhbau| %>
+					<div id="reload-ctbb-<%= ctbinhbau.id %>" class="reload-abc">
+
+					<div class="tieuchi-item" id="ctbinhbau-<%= ctbinhbau.id %>">
+						<div class="four column">
+							<h4 class="title0"><span><%= ctbinhbau.tieu_chi.TenTieuChi %></span></h4>
+							<div id="motatieuchi">
+								<%= sanitize ctbinhbau.tieu_chi.MoTaTieuChi %>
+							</div>
+						</div>
+						<div class="eight column">
+							<h4 class="title0"><span>Danh sách các trường tham gia</span></h4>
+							<ul class="list-truong" ctbb="<%= ctbinhbau.id %>">
+							<%@diemtong=0%>
+							<%ctbinhbau.chi_tiet_truongs.each do |cttruong| %>
+								<% @diemtong = @diemtong + cttruong.lich_su_binh_baus.sum(:SoDiem) %>
+							<%end%>
+							<% ctbinhbau.chi_tiet_truongs.each do |cttruong| %>
+								<li cttrg="<%= cttruong.id %>">
+									<%= link_to truncate(cttruong.truong.TenTruong, :length => 45), cttruong.truong, :title => cttruong.truong.TenTruong %>
+									(<%= cttruong.lich_su_binh_baus.sum(:SoDiem) %>)
+									<br/>
+									<% if @diemtong!=0 %>
+									<%@chieudai = 350/@diemtong*cttruong.lich_su_binh_baus.sum(:SoDiem)%>
+									<%end %>
+									<% if session[:FBUser].nil? == false && @binh_bau.Active == true && @binh_bau.NgayKetThuc >= DateTime.now%>
+										<%if (@lichsu = cttruong.lich_su_binh_baus.select{ |a| a[:user_id] == session[:FBUser][:id]}[0]) != nil%>
+										<% @sodiem = @lichsu.SoDiem %>
+										<%else%>
+										<%@sodiem = 0%>
+										<%end%>
+										<% for i in 0...@binh_bau.MaxSao%>
+											<%if i > @sodiem-1 %>
+											<span></span>
+											<%else%>
+											<span class="cur lock" ></span>
+											<%end%>
+										<%end%>(<%=@sodiem %>/<%=@binh_bau.MaxSao%>)
+									<%end%>
+									<div class="result-bar">
+										<div class="result-bar-content" style="width:<%=@chieudai%>px"></div>
+									</div>
+								</li>
+
+							<% @chieudai = 0%>
+							<%end%>
+							</ul>
+						</div>
+						<div class="twelve column">
+							<h4 class="title0 right"><a href="#" class="a-button2" id="<%=ctbinhbau.id%>">Xem nhận xét</a></h4>
+							<div class="comments basic-modal-content">
+								<h4>Nhận xét về tiêu chí: <%= ctbinhbau.tieu_chi.TenTieuChi%></h4>
+								<ul id="comment-list"></ul>
+								<% if session[:FBUser].nil? == false %>
+								<form action="/" method="post" class="comment-form" id="comment-form-tc">
+									<div class="field">
+										<label>Nhận xét về trường: </label><select name="truong">
+												<% ctbinhbau.chi_tiet_truongs.each do |cttruong| %>
+													<option value="<%= cttruong.truong.id %>"><%= cttruong.truong.TenTruong %></option>
+												<% end %>
+										</select>
+									</div>
+									<div class="field">
+										<label>Nội dung: </label><textarea name="noidung"></textarea>
+									</div>
+									<div class="field">
+										<label> </label><div class="submit" data-id="<%=ctbinhbau.id%>">Đăng</div> <span></span>
+									</div>
+								</form>
+								<%else%>
+									<h5>Bạn cần đăng nhập để có thể nhận xét</h5>
+								<%end%>
+							</div>
+						</div>
+					</div>
+					</div>
+					<% end %>
+					</div>
+					<div class="row">
+					<div class="title" id="ctmota">
+						<span style="display:inline-block;">Mô tả bình bầu</span>
+					</div>
+					<div class="twelve column">
+						<%= @binh_bau.MoTaBinhBau.html_safe %>
+					</div>
+					</div>
+					<div class="row">
+					<div class="title">Nhận xét bình bầu</div>
+					<div class="twelve column">
+					<ul class="comments" id="ds-comment-tq" <%= (@binh_bau.nhan_xet_tqs.count == 0) ? "style=height:auto" : "" %>>
+								<% @binh_bau.nhan_xet_tqs.each do |nhanxet| %>
+									<li>
+										<div class="author-avatar"><img src="https://graph.facebook.com/<%= nhanxet.user.MaUser %>/picture" alt=""></div>
+										<div class="comment-author"><%= nhanxet.user.HoTen %></div>
+										<div class="comment-date"><%= nhanxet.created_at.strftime("Ngày %d/%m/%Y lúc %H:%M") %></div>
+										<div class="comment-text"><%= nhanxet.NoiDung %></div>
+										<div class="seperator"></div>
+									</li>
+								<% end %>
+								<%= (@binh_bau.nhan_xet_tqs.count == 0) ? "<h4 class='noice-aa'>Chưa có nhận xét nào</h4>".html_safe : "" %>
+					</ul>
+					
+								<% if session[:FBUser].nil? == false %>
+								<form action="/" method="post" class="comment-form" id="comment-form-tq">
+									<div class="field">
+										<label>Nội dung: </label><textarea name="noidung"></textarea>
+									</div>
+									<div class="field">
+										<label> </label><div class="submit" data-id="<%=@binh_bau.id%>">Đăng</div> <span></span>
+									</div>
+								</form>
+								<%else%>
+									<h4 class="noice-aa">Bạn cần đăng nhập để có thể nhận xét</h4>
+								<%end%>
+					</div>
+			</div>
+		</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu2msimPOhfXuJALCWsB4SBrIobLk9F04&sensor=false"></script>
+    <script>
+		function initialize() {
+
+			var vitri = [
+					  	<% @truongs.each do |truong| %>
+									[new google.maps.LatLng(<%= truong[:ToaDo] %>), '<%= truong_url(truong) %>', '<%= truong[:TenTruong] %>', '<%= truong[:Logo] %>'],
+						<% end %>
+						];
+
+		  	var mapOptions = {
+			    zoom: <%= @zoom %>,
+			    center: new google.maps.LatLng(<%= @y_p %>,<%= @x_p %>),
+			    mapTypeId: google.maps.MapTypeId.ROADMAP,
+			    mapTypeControl: true,
+				    mapTypeControlOptions: {
+				        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+				        position: google.maps.ControlPosition.BOTTOM_LEFT
+				    },
+			    panControl: true,
+				    panControlOptions: {
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+			    zoomControl: true,
+				    zoomControlOptions: {
+				        style: google.maps.ZoomControlStyle.SMALL,
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+		  	}
+
+		  	var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
+
+	  		var pos = 0;
+	  		for (var i = 0; i <= vitri.length - 1; i++) {
+	  			setTimeout(function() {
+		  			marker = new google.maps.Marker({
+					    map:map,
+					    draggable:false,
+					    position: vitri[pos][0],
+    					animation: google.maps.Animation.DROP,
+					    url: vitri[pos][1],
+					    title: vitri[pos][2],
+					    icon: new google.maps.MarkerImage(vitri[pos][3],
+				            new google.maps.Size(50, 50),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Size(50, 50)
+				        )
+				  	});
+				  	google.maps.event.addListener(marker, 'click', function() { window.location.href = this.url; });
+				  	pos +=1;
+			  	}, i *200);
+	  		};
+
+		}
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>

@@ -1,0 +1,30 @@
+<h3>Danh sách tiêu chí bình bầu</h3>
+<form action="tieu_chis" method="get" style="float:right">
+  <input type="text" name="search" id="search">
+  <input type="submit" value="Tìm kiếm">
+</form>
+<span class="link_button"><%= link_to 'Thêm tiêu chí', new_admin_tieu_chi_path %></span>
+
+<hr/>
+<table cellspacing=0>
+  <tr>
+    <th>Tên tiêu chí</th>
+    <th>Mô tả tiêu chí</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @tieu_chis.each do |tieu_chi| %>
+  <tr>
+    <td><%= link_to tieu_chi.TenTieuChi, tieu_chi %></td>
+    <td><%=sanitize truncate(tieu_chi.MoTaTieuChi, :length => 100) %></td>
+    <td><%= link_to 'Sửa', edit_admin_tieu_chi_path(tieu_chi) %></td>
+    <td><%= link_to 'Xóa', admin_tieu_chi_path(tieu_chi), method: :delete, data: { confirm: 'Bạn có chắc muốn xóa?' } %></td>
+  </tr>
+<% end %>
+</table>
+<br>
+
+    <%= will_paginate @tieu_chis %>
+<br />
+

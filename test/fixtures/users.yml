@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  MaUser: MyString
+  HoTen: MyString
+  Active: false
+
+two:
+  MaUser: MyString
+  HoTen: MyString
+  Active: false

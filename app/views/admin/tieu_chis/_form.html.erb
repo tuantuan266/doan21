@@ -1,0 +1,30 @@
+<%= form_for([:admin, @tieu_chi]) do |f| %>
+ <div class="field">
+    <label> </label>
+  <% if @tieu_chi.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@tieu_chi.errors.count, "error") %> prohibited this tieu_chi from being saved:</h2>
+
+      <ul>
+      <% @tieu_chi.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div class="field">
+    <%= f.label 'Tên tiêu chí: ' %>
+    <%= f.text_field :TenTieuChi %>
+</div>
+<div class="field">
+    <%= f.label 'Mô tả tiêu chí: ' %>
+    <%= f.text_area :MoTaTieuChi %>
+</div>
+  <div class="field" style="margin:30px 0;">
+    <label> </label>
+    <%= f.submit 'Hoàn tất' %>
+  </div>
+
+<% end %>

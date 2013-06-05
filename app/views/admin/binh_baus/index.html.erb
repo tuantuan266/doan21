@@ -1,0 +1,38 @@
+
+<h3>Danh sách bình bầu</h3>
+<form action="binh_baus" method="get" style="float:right">
+  <input type="text" name="search" id="search">
+  <input type="submit" value="Tìm kiếm">
+</form>
+<span class="link_button"><%= link_to 'Thêm bình bầu mới', new_admin_binh_bau_path %></span>
+
+<hr/>
+<table cellspacing="0">
+  <tr>
+    <th>Tên bình bầu</th>
+    <th>Mô Tả</th>
+    <th width="10%">Lượt bình bầu/ Lượt xem</th>
+    <th width="10%">Ngày bắt đầu / Ngày kết thúc</th>
+    <th width="12%">Trạng thái</th>
+  </tr>
+
+<% @binh_baus.each do |binh_bau| %>
+  <tr>
+    <td><%= link_to binh_bau.TenBinhBau, binh_bau %></td>
+    <td><%= sanitize truncate(binh_bau.MoTaBinhBau, :length => 255)%></td>
+    <td><%= binh_bau.LuotBinhBau %> / <%= binh_bau.LuotXem %></td>
+    <td><%= binh_bau.NgayBatDau %> / <%= binh_bau.NgayKetThuc %></td>
+    <td>
+      <% if binh_bau.Active == true %>
+          <%= link_to 'Kích hoạt', edit_admin_binh_bau_path(binh_bau), data: { confirm: 'Bạn có muốn kết thúc bình bầu này ?' } %>
+          <%else%>
+          <%= link_to 'Không kích hoạt', edit_admin_binh_bau_path(binh_bau), data: { confirm: 'Bạn có muốn chạy lại bình bầu này?' } %>
+          <%end%>
+    </td>
+  </tr>
+<% end %>
+</table>
+<br>
+
+    <%= will_paginate @binh_baus %>
+<br />

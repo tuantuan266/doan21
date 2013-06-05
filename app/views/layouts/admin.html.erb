@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quản trị</title>
+  <%= stylesheet_link_tag    "admin/application", :media => "all" %>
+  <%= stylesheet_link_tag    "scaffolds", :media => "all" %>
+  <%= stylesheet_link_tag    "admin/jquery-ui.min", :media => "all" %>
+  <%= stylesheet_link_tag    "admin/ui.multiselect", :media => "all" %>
+  <%= stylesheet_link_tag    "admin/jquery.multiselect", :media => "all" %>
+  <%= javascript_include_tag "tinymce/tinymce.min.js" %>
+  <%= javascript_include_tag "admin/application" %>
+  <%= javascript_include_tag "admin/jquery-ui.js" %>
+  <%= javascript_include_tag "admin/ui.multiselect" %>
+  <%= javascript_include_tag "admin/jquery.multiselect.min" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+	<div id="documenter_sidebar">
+			<a href="" id="documenter_logo"></a>
+			<ol id="documenter_nav">
+				<% if session[:user_id].nil? %>
+				<li class="login">
+					<p id="notice"><%= notice %></p>
+					<%= form_tag("/admin", :method => "post", :id => "login", :name => "login") do %>
+						<label>Tên đăng nhập: </label><input type="text" name="username" id="username"/>
+						<label>Mật khẩu: </label><input type="password" name="pass" id="pass"/>
+						<label></label><input type="submit" value="Đăng nhập" />
+				<% end %>
+				</li>
+				<% else %>
+				<li><a class="<%= current_page?('/admin') ? 'current' : nil %>" href="/admin">Trang Chủ</a></li>
+				<li><%= link_to 'Quản lý bình bầu', admin_binh_baus_path,  :class => current_page?(admin_binh_baus_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Quản lý tiêu chí', admin_tieu_chis_path,  :class => current_page?(admin_tieu_chis_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Quản lý trường', admin_truongs_path,  :class => current_page?(admin_truongs_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Quản lý nhận xét', admin_nhan_xets_path,  :class => current_page?(admin_nhan_xets_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Quản lý nhận xét tổng qua', admin_nhan_xet_tqs_path,  :class => current_page?(admin_nhan_xet_tqs_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Quản lý thành viên', admin_users_path,  :class => current_page?(admin_users_path) ? 'current' : nil %></li>
+				<li><%= link_to 'Thoát', '/admin/logout' %></li>
+				<% end %>
+			</ol>
+	</div>
+	<div id="documenter_content">
+		<section>
+					<%= yield %>
+		</section>
+	</div>
+</body>
+</html>

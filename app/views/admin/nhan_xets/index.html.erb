@@ -1,0 +1,33 @@
+<h3>Danh sách các nhận xét</h3>
+<form action="nhan_xets" method="get" style="float:right">
+  <input type="text" name="search" id="search">
+  <input type="submit" value="Tìm kiếm">
+</form>
+<hr/>
+<table cellspacing="0">
+  <tr>
+    <th>Chi tiết bình bầu</th>
+
+    <th>Tên tiêu chí</th>
+    <th>Tên trường</th>
+
+    <th>User</th>
+    <th>Nội dung</th>
+    <th></th>
+  </tr>
+
+<% @nhan_xets.each do |nhan_xet| %>
+  <tr>
+    <td><%= link_to nhan_xet.chi_tiet_binh_bau.binh_bau.TenBinhBau, nhan_xet.chi_tiet_binh_bau.binh_bau %></td>
+    <td><%= link_to nhan_xet.chi_tiet_binh_bau.tieu_chi.TenTieuChi, nhan_xet.chi_tiet_binh_bau.tieu_chi %></td>
+    <td><%= link_to nhan_xet.truong.TenTruong, nhan_xet.truong %></td>
+    <td><%= nhan_xet.user.HoTen %></td>
+    <td><%= nhan_xet.NoiDung %></td>
+    <td><%= link_to 'Xóa', admin_nhan_xet_path(nhan_xet), method: :delete, data: { confirm: 'Bạn có chắc muốn xóa?' } %></td>
+  </tr>
+<% end %>
+</table>
+<br>
+
+    <%= will_paginate @nhan_xets %>
+<br />

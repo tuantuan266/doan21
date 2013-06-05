@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @title_page %></title>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700,700italic&subset=latin,vietnamese' rel='stylesheet' type='text/css'>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "jquery.simplemodal" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+	<div id="wrap">
+		<div id="header">
+			<div class="container">
+				<div id="logo">
+					<a href="/"><%= image_tag 'logo.png' %></a>
+				</div>
+
+				<div id="box-login">
+					<div id="FBaccount">
+						<% if session[:FBUser].nil? %>
+						<div id="FBlogout">
+							<%= image_tag 'login.png' %>
+							<%= form_tag("/users", :method => "post", :id => "new_user", :class => "new_user") do %>
+								<input id="user_MaUser" name="user[MaUser]" size="30" type="hidden" value="">
+							    <input id="user_Active" name="user[Active]" size="30" type="hidden" value="1">
+							    <input id="user_Name" name="user[HoTen]" size="30" type="hidden" value="">
+							    <input id="user_Image" name="Image" size="30" type="hidden" value="">
+							<% end %>
+						</div>
+						<% else %>
+						<div id="FBlogin">
+							<%= image_tag session[:FBUser][:Image], size: '60x60' %>
+							<div id="FBpopmenu">
+								<%= session[:FBUser][:Name] %>
+								<a href="/users?logout=true">(Thoát)</a>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<div id="search">
+						<%= form_tag("/timkiem", :method => "post") do %>
+							<input type="text" name="key" id="txt-search" value="Tìm kiếm" onblur="if (this.value == '') {this.value = 'Tìm kiếm';}"
+	 onfocus="if (this.value == 'Tìm kiếm') {this.value = '';}" maxlength="50" size="20" autocomplete="off"/>
+							<input type="submit" id="submit-search" value=""/>
+						<% end %>
+						<div id="TKresultajax">
+							<div id="TK_bb"></div>
+							<div id="TK_tg"></div>
+							<div id="TK_tc"></div>
+						</div>
+					</div>
+				</div>
+				<div id="nav">
+					<ul id="navlist" class="sf-menu">
+						<li class="<%= current_page?('/') ? 'current' : nil %>"><a href="/">Trang chủ</a></li>
+						<li class="<%= current_page?('/binh_baus') ? 'current' : nil %>"><a href="/binh_baus">Bình bầu mở</a></li>
+						<li class="<%= current_page?('/binh_baus?end=true') ? 'current' : nil %>"><a href="/binh_baus?end=true">Bình bầu đóng</a></li>
+						<li class="<%= current_page?('/truongs') ? 'current' : nil %>"><a href="/truongs">Trường</a></li>
+						<li class="<%= current_page?('/timkiem') ? 'current' : nil %>"><a href="/timkiem">Tìm kiếm</a></li>
+					</ul>
+
+				</div>
+
+			</div>
+		</div>
+
+	    <div id="map-container"></div>
+
+		<div id="content">
+			<div class="container">
+				<%= yield %>
+			</div>
+		</div>
+		<div id="footer">
+			<div class="container">
+				<ul class="no-bullet row">
+					<li class="six column">
+						<h3 class="widget-title">Thông tin đồ án</h3>
+						<p><strong>Team ID:</strong> 21 <br>
+						<strong>Project ID:</strong>	UDDB2-05 <br/>
+						<strong>Project Name:</strong> Hệ thống bình bầu trực quan<br/>
+						<strong>Supervisor Name:</strong> Lương Vĩ Minh (lvminh@fit.hcmus.edu.vn)
+						</p>
+						<ul id="team-member">
+							<li><img src="https://secure.gravatar.com/avatar/d217975a47ed275e6a7ac702eac9f318" alt="">
+								<br>Vĩnh Phôn
+							</li>
+							<li><img src="https://secure.gravatar.com/avatar/256137d704381de147172a1829cf5a98" alt=""><br>Uyên Minh</li>
+							<li><img src="https://secure.gravatar.com/avatar/31b7e87e90cd472bdf1b40f9cd1f084b" alt=""><br>Xuân Nghiệp</li>
+							<li><img src="https://secure.gravatar.com/avatar/5dd0263eb585ff5f1fd9b69811d36db1" alt=""><br>Vương Uy</li>
+						</ul>
+					</li>
+
+					<li class="six column">
+						<h3 class="widget-title">Thông tin website</h3>
+						<p>Là hệ thống bình bầu cho các trường đại học, dựa theo các tiêu chí được đưa ra, một số trường sẽ được lựa chọn trong các cuộc bình bầu do admin tạo ra, để đánh giá chất lượng trường. Hệ thống sẽ liên kết mạng xã hội Facebook để đăng nhập, chia sẽ và sử dụng bản đổ Google Map để hiển thị vị trí các trường. Hệ thống sẽ đánh giá theo sao và có phần comment cho các thành viên đăng nhập. Ngoài ra hệ thống sẽ có các phần thống kê các Top để khách xem được dễ dàng hơn.</p>
+					</li>
+
+				</ul>
+
+				<div id="back-to-top">
+					<a href="#top">Top</a>
+				</div>
+
+				<div class="copyright">© 2013 Team 21 Pro. All Rights Reserved.</div>
+			</div>
+		</div>
+<div id="errorpopup"><%= notice %></div>
+</body>
+</html>

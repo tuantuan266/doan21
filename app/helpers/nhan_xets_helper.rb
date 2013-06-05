@@ -1,0 +1,2 @@
+module NhanXetsHelper
+end

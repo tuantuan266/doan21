@@ -1,0 +1,127 @@
+<% @title_page= "Trang chủ" %>
+<div class="row">
+					<div class="four column">
+						<div class="title">Top các tiêu chí</div>
+						<ul class="danhsach">
+							<% @toptieuchi.each do |tieuchi| %>
+								<li><%= link_to  truncate(tieuchi.TenTieuChi, :length => 50), tieuchi, :title => tieuchi.TenTieuChi %></li>
+							<% end %>
+						</ul>
+					</div>
+					<div class="four column">
+						<div class="title">Top các bình bầu</div>
+						<ul class="danhsach">
+							<% @topbinhbau.each do |binhbau| %>
+								<li><%= link_to truncate(binhbau.TenBinhBau, :length => 50), binhbau, :title => binhbau.TenBinhBau %></li>
+							<% end %>
+						</ul>
+					</div>
+					<div class="four column">
+						<div class="title">Top các trường</div>
+						<ul class="danhsach">
+							<% @toptruong.each do |truong| %>
+								<li><%= link_to truncate(truong.TenTruong, :length => 50), truong, :title => truong.TenTruong %></li>
+							<% end %>
+						</ul>
+					</div>
+				</div>
+				<div class="row">
+						<div class="title">Các bình bầu mới nhất</div>
+						<div id="list-binhbau">
+						<% @newbinhbau.each do |binhbau| %>
+							<div class="item-binhbau">
+								<h4 class="title0"><span><%= link_to binhbau.TenBinhBau, binhbau %></span> <span style="float:right">( <% if binhbau.Active == false %>Đã hủy
+								<% elsif binhbau.NgayKetThuc < DateTime.now.to_date %>Đã kết thúc
+								<%else%>
+								<%=binhbau.NgayBatDau.strftime("%d/%m/%Y") %> - <%= binhbau.NgayKetThuc.strftime("%d/%m/%Y")%>
+								<%end%>)</span></h4>
+								<ul class="danhsach chia2">
+									<% dstruong = []
+									%>
+									<% 	binhbau.chi_tiet_binh_baus.each do |chitiet| %>
+										<% chitiet.chi_tiet_truongs.each do |cttruong|
+											dstruong.push(cttruong.truong)
+										%>
+										<% end %>
+									<% end %>
+									<% dstruong.uniq!
+										dstruong.each do |truong| %>
+										<li><%= link_to truncate(truong.TenTruong, :length => 40), truong, :title => truong.TenTruong%></li>
+									<% end %>
+								</ul>
+								<div class="mota-binhbau">
+									<%= truncate(binhbau.MoTaBinhBau.html_safe, :length => 255) %>
+								</div>
+								<div class="thongke">
+									<span class="left">
+										<% binhbau.chi_tiet_binh_baus.each do |chi_tiet|%>
+											<%=link_to chi_tiet.tieu_chi.TenTieuChi, chi_tiet.tieu_chi %> ,
+										<% end %>
+									</span>
+									<span class="right">Lượt view: <%= binhbau.LuotXem %> | Lượt bình chọn: <%= binhbau.LuotBinhBau %></span>
+								</div>
+							</div>
+						<% end %>
+					</div>
+				</div>
+
+		<%= will_paginate @newbinhbau %>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu2msimPOhfXuJALCWsB4SBrIobLk9F04&sensor=false"></script>
+    <script>
+		function initialize() {
+
+			var vitri = [
+					  	<% @truongs.each do |truong| %>
+									[new google.maps.LatLng(<%= truong[:ToaDo] %>), '<%= truong_url(truong) %>', '<%= truong[:TenTruong] %>', '<%= truong[:Logo] %>'],
+						<% end %>
+						];
+
+		  	var mapOptions = {
+			    zoom: <%= @map[:zoom] %>,
+			    center: new google.maps.LatLng(<%= @map[:y_p] %>,<%= @map[:x_p] %>),
+			    mapTypeId: google.maps.MapTypeId.ROADMAP,
+			    mapTypeControl: true,
+				    mapTypeControlOptions: {
+				        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+				        position: google.maps.ControlPosition.BOTTOM_LEFT
+				    },
+			    panControl: true,
+				    panControlOptions: {
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+			    zoomControl: true,
+				    zoomControlOptions: {
+				        style: google.maps.ZoomControlStyle.SMALL,
+				        position: google.maps.ControlPosition.RIGHT_CENTER
+				    },
+		  	}
+
+		  	var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
+
+	  		var pos = 0;
+	  		for (var i = 0; i <= vitri.length - 1; i++) {
+	  			setTimeout(function() {
+		  			marker = new google.maps.Marker({
+					    map:map,
+					    draggable:false,
+					    position: vitri[pos][0],
+    					animation: google.maps.Animation.DROP,
+					    url: vitri[pos][1],
+					    title: vitri[pos][2],
+					    icon: new google.maps.MarkerImage(vitri[pos][3],
+				            new google.maps.Size(50, 50),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Point(0, 0),
+				            new google.maps.Size(50, 50)
+				        )
+				  	});
+				  	google.maps.event.addListener(marker, 'click', function() { window.location.href = this.url; });
+				  	pos +=1;
+			  	}, i *200);
+	  		};
+
+		}
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
